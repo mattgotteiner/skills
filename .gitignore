@@ -1,0 +1,18 @@
+# Generated Python files.
+__pycache__/
+*.py[cod]
+.venv/
+
+# Local credentials and CLI state.
+.azure/
+.azd/
+.az-azd-sessions/
+az-azd-sessions/
+.env
+.env.*
+!.env.example
+
+# This distribution excludes tests, evaluations, and optimization artifacts.
+tests/
+evals/
+hillclimb-state.json
