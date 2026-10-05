@@ -1,11 +1,12 @@
 # Agent skills
 
 Reusable, open-source instructions and companion scripts for AI coding agents.
-This repository currently contains one skill:
+This repository currently contains these skills:
 
 | Skill | Purpose |
 | --- | --- |
 | [az-azd](skills/az-azd/SKILL.md) | Run Azure CLI and Azure Developer CLI with separate configuration and authentication profiles. |
+| [azd-worktree](skills/azd-worktree/SKILL.md) | Share Azure Developer CLI environment state between a linked Git worktree and its main checkout. |
 
 ## Layout
 
@@ -17,6 +18,9 @@ skills/
   az-azd/
     SKILL.md
     az-azd.py
+  azd-worktree/
+    SKILL.md
+    wire-azd-worktree.py
 ```
 
 This distribution contains skill instructions and runtime scripts only.
@@ -24,11 +28,11 @@ Evaluation suites, fixtures, results, and optimization artifacts are not include
 
 ## Use with an agent
 
-Copy the entire `skills/az-azd` directory into a skill location supported by
-your agent, keeping `SKILL.md` and `az-azd.py` together. For example, GitHub
-Copilot supports project skills in `.github/skills/az-azd` and personal skills
-in `~/.copilot/skills/az-azd`. Retain the [license](LICENSE) when redistributing
-the files.
+Copy the entire directory for the desired skill into a skill location supported
+by your agent, keeping `SKILL.md` and any companion scripts together. For
+example, GitHub Copilot supports project skills in `.github/skills/<name>` and
+personal skills in `~/.copilot/skills/<name>`. Retain the [license](LICENSE)
+when redistributing the files.
 
 Reload skills as required by your client. Ask the agent to use `az-azd` for an
 Azure CLI task and supply the intended tenant and subscription. Installation
