@@ -26,6 +26,68 @@ continues to provision and deploy source code from the current worktree.
 
 Do not run azd from a linked worktree before completing this wiring step.
 
+## Manual fallback without Python
+
+If Python 3.10+ is unavailable, use Git to resolve the paths and create the link
+manually. Preserve the same safety rule as the script: never overwrite an
+existing `.azure` path.
+
+### POSIX shell
+
+Run from the checkout or a subdirectory:
+
+```shell
+WORKTREE_ROOT=$(git rev-parse --show-toplevel)
+GIT_DIR=$(git rev-parse --path-format=absolute --git-dir)
+COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir)
+```
+
+If `GIT_DIR` does not contain `/worktrees/`, this is the main checkout and no
+link is needed. Otherwise:
+
+```shell
+MAIN_ROOT=$(dirname "$COMMON_DIR")
+COMMON_AZURE="$MAIN_ROOT/.azure"
+WORKTREE_AZURE="$WORKTREE_ROOT/.azure"
+
+mkdir -p "$COMMON_AZURE"
+if [ -e "$WORKTREE_AZURE" ] || [ -L "$WORKTREE_AZURE" ]; then
+  echo "$WORKTREE_AZURE already exists; inspect it and do not overwrite it." >&2
+  exit 2
+fi
+ln -s "$COMMON_AZURE" "$WORKTREE_AZURE"
+```
+
+### PowerShell
+
+Run from the checkout or a subdirectory:
+
+```powershell
+$worktreeRoot = (git rev-parse --show-toplevel).Trim()
+$gitDir = (git rev-parse --path-format=absolute --git-dir).Trim()
+$commonDir = (git rev-parse --path-format=absolute --git-common-dir).Trim()
+```
+
+If `$gitDir` does not contain `\worktrees\`, this is the main checkout and no
+link is needed. Otherwise:
+
+```powershell
+$mainRoot = Split-Path $commonDir -Parent
+$commonAzure = Join-Path $mainRoot '.azure'
+$worktreeAzure = Join-Path $worktreeRoot '.azure'
+
+New-Item -ItemType Directory -Force -Path $commonAzure | Out-Null
+$existing = Get-ChildItem -LiteralPath $worktreeRoot -Force |
+    Where-Object Name -EQ '.azure'
+if ($null -ne $existing) {
+    throw "$worktreeAzure already exists; inspect it and do not overwrite it."
+}
+New-Item -ItemType SymbolicLink -Path $worktreeAzure -Target $commonAzure | Out-Null
+```
+
+Creating a symlink on Windows can require Developer Mode or elevated
+permissions.
+
 ## Behavior
 
 The script reads:
